@@ -1,2 +1,2 @@
 # DOPP
-init
+Group project in DOPP
