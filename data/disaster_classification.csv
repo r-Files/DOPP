@@ -1,0 +1,63 @@
+Disaster Group,Disaster Sub-Group,Disaster Type,Disaster Sub-Type,Disaster Sub-Sub Type
+Natural,Geophysical,Earthquake,Ground movement,
+,,,Tsunami,
+,,Volcanic activity,Ash fall,
+,,,Lahar,
+,,,Pyroclastic flow,
+,,,Lava flow,
+,,Mass Movement,,
+,Meteorological,Storm,Tropical storm,
+,,,Extra-tropical storm,
+,,,Convective storm,Derecho
+,,,,Hail
+,,,,Lightning/thunderstorm
+,,,,Rain
+,,,,Tornado
+,,,,Sand/dust storm
+,,,,Winter storm/blizzard
+,,,,Storm/surge
+,,,,Wind
+,,,,Severe Storm
+,,Extreme Temperature,Cold wave,
+,,,Heat Wave,
+,,,Severe winter conditions,Snow/ice
+,,,,Frost/freeze
+,,Fog,,
+,Hydrological,Flood,Coastal flood,
+,,,Riverine flood,
+,,,Flash flood,
+,,,Ice jam flood,
+,,Landslide,"Avalanche (snow, debris, mudflow, rock fall)",
+,,Wave action,Rogue wave,
+,,,Seiche,
+,Climatological,Drought,Drought,
+,,Glacial Lake outburst,,
+,,Wildfire,Forest fires,
+,,,"Land fire: Brush, bush, pasture",
+,Biological,Epidemic,Viral diseases,
+,,,Bacterial diseases,
+,,,Parasitic diseases,
+,,,Fungal diseases,
+,,,Prion diseases,
+,,Insect Infestation,LocustGrasshopper,
+,,Animal accident,,
+,Extra-terrestrial,Impact,Airburst,
+,,Space weather,Energic particles,
+,,,Geomagnetic storm,
+,,,Shockwave,
+Technological,Technological,Industrial accident,Chemical spill,
+,,,Collapse,
+,,,Explosion,
+,,,Fire,
+,,,Gas leak,
+,,,Poisoning,
+,,,Radiation,
+,,,Other,
+,,Miscellaneous accident,Collapse,
+,,,Explosion,
+,,,Fire,
+,,,Other,
+,,Transport accident,Air,
+,,,Rail,
+,,,Road,
+,,,Water,
