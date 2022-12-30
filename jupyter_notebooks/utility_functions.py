@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from numpy import sort
 
 
 def get_yearly_deaths(df: pd.DataFrame, custom_index: list = None, include_zero: bool = True) -> pd.Series:
