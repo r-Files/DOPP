@@ -1,6 +1,10 @@
-import pandas as pd
+import json
 import numpy as np
-
+import pandas as pd
+from bokeh.palettes import brewer
+from bokeh.plotting import figure
+from bokeh.io import output_notebook, show, output_file
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
 
 def get_yearly_deaths(df: pd.DataFrame, custom_index: list = None, include_zero: bool = True) -> pd.Series:
     """ Calculate yearly disaster deaths, assuming a continuous uniform distribution of deaths
@@ -86,3 +90,46 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list = None, include_zero:
         deaths_per_year = deaths_per_year[deaths_per_year!=0]
 
     return deaths_per_year
+
+def plot_world_map(merged, title):
+    """
+    Plotting world maps.
+
+    Parameters
+    ----------
+    merged: pd.DataFrame
+        Dataframe merged with coordinates df
+
+    Plots
+    -------
+    World map
+    """
+    # Read data to json.
+    merged_json = json.loads(merged.to_json())
+    # Convert to String like object.
+    json_data = json.dumps(merged_json)
+    # Input GeoJSON source that contains features for plotting.
+    geosource = GeoJSONDataSource(geojson=json_data)
+    # Define a sequential multi-hue color palette.
+    palette = brewer['YlGnBu'][8]
+    # Reverse color order so that dark blue is highest obesity.
+    palette = palette[::-1]
+    # Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+    color_mapper = LinearColorMapper(palette=palette, low=0, high=1)
+    # Create color bar.
+    color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8, width=500, height=20,
+                         border_line_color=None, location=(0, 0), orientation='horizontal')
+    # Create figure object.
+    p = figure(title=title, plot_height=600, plot_width=950,
+               toolbar_location=None)
+    p.xgrid.grid_line_color = None
+    p.ygrid.grid_line_color = None
+    # Add patch renderer to figure.
+    p.patches('xs', 'ys', source=geosource, fill_color={'field': 'Total_Deaths', 'transform': color_mapper},
+              line_color='black', line_width=0.25, fill_alpha=1)
+    # Specify figure layout.
+    p.add_layout(color_bar, 'below')
+    # Display figure inline in Jupyter Notebook.
+    output_notebook()
+    # Display figure.
+    show(p)
