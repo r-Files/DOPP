@@ -4,3 +4,4 @@ openpyxl~=3.0.10
 pandas~=1.5.2
 seaborn~=0.12.2
 bokeh~=3.0.3
+geopandas
