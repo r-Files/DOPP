@@ -130,10 +130,10 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list | None = None, includ
             return
 
         yearly_deaths_by_duration: pd.DataFrame = year_df[["Duration_CalendarYears", "Yearly_Disaster_Deaths"] + custom_index]\
-            .groupby(["Duration_CalendarYears"] + custom_index).sum()
+            .groupby(["Duration_CalendarYears"] + custom_index, sort=False).sum()
 
         duration_df: pd.DataFrame
-        for Duration_CalendarYears, duration_df in yearly_deaths_by_duration.groupby(level="Duration_CalendarYears"):
+        for Duration_CalendarYears, duration_df in yearly_deaths_by_duration.groupby(level="Duration_CalendarYears", sort=False):
             duration_df.reset_index(inplace=True)
             duration_df.drop("Duration_CalendarYears", axis=1, inplace=True)
 
@@ -148,14 +148,14 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list | None = None, includ
 
             deaths_per_year = deaths_per_year.add(add_series, fill_value=0)
 
-    perennial_disasters.groupby("Year", as_index=False).apply(_flatten_death_distr)
+    perennial_disasters.groupby("Year", as_index=False, sort=False).apply(_flatten_death_distr)
 
     if custom_index == alternate_cust_idx:
         deaths_per_year.reset_index(level=custom_index, inplace=True, drop=True)
     if not include_zero:
         deaths_per_year = deaths_per_year[deaths_per_year!=0]
 
-    return deaths_per_year
+    return deaths_per_year.astype(np.float64)
 
 
 def plot_world_map(merged, title):
