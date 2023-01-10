@@ -6,20 +6,22 @@ from bokeh.plotting import figure
 from bokeh.io import output_notebook, show, output_file
 from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
 
-def get_yearly_disaster_count(groupby_base: pd.DataFrame, index_cols:list=None, include_zero:bool=True) -> pd.Series:
+def get_yearly_disaster_count(df: pd.DataFrame, index_cols: list | None = None, include_zero: bool = True) -> pd.Series:
     """ Calculates number of disaster occurrences grouped by the secondary_index column for each Start_Year.
 
     Parameters
     ----------
-    secondary_index: str
-        Must be a column label of groupby_base.
-        Probably one of [Disaster_Subgroup, Disaster_Type, Disaster_Subtype, Disaster_Subsubtype]
-        If None than result will not be grouped.
+    df: pd.DataFrame
+        The dataframe containing the disaster data. One row represents one disaster.
+    index_cols: list or None
+        The columns that df should be grouped by and indexed. If None, "Start_Year" will be used.
+        Default: None
     include_zero: bool
         If True zero counts will be included, otherwise the rows are dropped
+
     Returns
     -------
-    pd.Series named "No_Disasters"
+    pd.Series named "No_Disasters" indexed by index_cols
 
     :Authors:
         Moritz Renkin <e11807211@student.tuwien.ac.at>
@@ -28,37 +30,45 @@ def get_yearly_disaster_count(groupby_base: pd.DataFrame, index_cols:list=None, 
     default_index = ["Start_Year"]
     index = index_cols if index_cols is not None else default_index
     if not include_zero:
-        return groupby_base.groupby(index).size().rename("No_Disasters")
+        return df.groupby(index).size().rename("No_Disasters")
 
-    count_nonzero = get_yearly_disaster_count(groupby_base=groupby_base, index_cols=index_cols, include_zero=False)
+    count_nonzero = get_yearly_disaster_count(df=df, index_cols=index_cols, include_zero=False)
     if index != default_index:
         return count_nonzero.unstack(fill_value=0).stack().rename("No_Disasters")
     return count_nonzero
 
-def get_yearly_pct_change_to_initial(groupby_base: pd.DataFrame, index_cols:list=None) -> pd.Series:
-    """ Calculates yearly percentage change number of disaster occurrences compared to the first year, grouped by the respective column.
+def get_yearly_pct_change_to_initial(df: pd.DataFrame, index_cols: list | None = None) -> pd.Series:
+    """ Calculates yearly percentage change number of disaster occurrences compared to the average of the first 10 years, grouped by the respective column.
 
     Parameters
     ----------
-    secondary_index: str
-        Must be a column label of groupby_base.
-        Probably one of [Disaster_Subgroup, Disaster_Type, Disaster_Subtype, Disaster_Subsubtype]
+    df: pd.DataFrame
+        The dataframe containing the disaster data. One row represents one disaster.
+    index_cols: list or None
+        The columns that df should be grouped by and indexed. If None, "Start_Year" will be used.
+        Default: None
 
     Returns
     -------
-    pd.Series with Multiindex ("Start_Year", secondary_index) and named "Percent_Change"
+    pd.Series named "Percent_Change" indexed by index_cols
 
     :Authors:
         Moritz Renkin <e11807211@student.tuwien.ac.at>
     """
-    count_nonzero = get_yearly_disaster_count(groupby_base=groupby_base, index_cols=index_cols, include_zero=False)
+    min_year = df["Start_Year"].min()
+    counts: pd.Series = get_yearly_disaster_count(df=df, index_cols=index_cols, include_zero=True)
+    initial_average = counts.loc[min_year:min_year+10].groupby(level=1).mean()
     if index_cols is not None:
-        return count_nonzero.groupby(level=[1], group_keys=False).apply(lambda x: (x.div(x.iloc[0]) -1) *100).fillna(0).rename("Percent_Change")
-    percent_change = (count_nonzero.div(count_nonzero.iloc[0]) -1) *100
-    return percent_change.fillna(0).rename("Percent_Change")
+        ret = counts.groupby(level=[1], group_keys=False).apply(lambda x: (x.div(initial_average, level=1) -1) *100).rename("Percent_Change")
+    else:
+        percent_change = (count_nonzero.div(count_nonzero.iloc[0]) -1) *100
+        ret = percent_change.rename("Percent_Change")
+    ret.replace([np.inf, -np.inf], np.nan, inplace=True)
+    ret.dropna(inplace=True)
+    return ret
 
 
-def get_yearly_deaths(df: pd.DataFrame, custom_index: list = None, include_zero: bool = True) -> pd.Series:
+def get_yearly_deaths(df: pd.DataFrame, custom_index: list | None = None, include_zero: bool = True) -> pd.Series:
     """ Calculate yearly disaster deaths, assuming a continuous uniform distribution of deaths between Start_Year and End_Year of each disaster.
 
     Parameters
@@ -66,9 +76,11 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list = None, include_zero:
     df: pd.DataFrame
         The original DataFrame
     custom_index: list or None
-        The labels to group the deaths by. Must be a column in the data, but not "Start_Year" or "End_Year".
+        The columns to group the deaths by. Must be a column in the data, but not "Start_Year" or "End_Year".
+        Note that df is not normalized. Only independent columns should be passed in order to avoid anomalies. Example: [Country, Disaster_Type] -> ok. [Disaster_Type, Disaster_Subtype] -> NOT ok.
     include_zero: bool
         Include rows with 0 deaths.
+        Note that enabling this option in combination with a custom_index will lengthen the returned series considerably.
 
     Returns
     -------
