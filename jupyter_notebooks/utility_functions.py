@@ -7,7 +7,7 @@ from bokeh.io import output_notebook, show, output_file
 from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
 
 def get_yearly_disaster_count(df: pd.DataFrame, index_cols: list | None = None, include_zero: bool = True) -> pd.Series:
-    """ Calculates number of disaster occurrences grouped by the secondary_index column for each Start_Year.
+    """ Calculate number of disaster occurrences grouped by index_cols for each Start_Year.
 
     Parameters
     ----------
@@ -38,7 +38,7 @@ def get_yearly_disaster_count(df: pd.DataFrame, index_cols: list | None = None, 
     return count_nonzero
 
 def get_yearly_pct_change_to_initial(df: pd.DataFrame, index_cols: list | None = None) -> pd.Series:
-    """ Calculates yearly percentage change number of disaster occurrences compared to the average of the first 10 years, grouped by the respective column.
+    """ Calculate yearly percentage change number of disaster occurrences compared to the average of the first 10 years, grouped by the respective column.
 
     Parameters
     ----------
@@ -76,11 +76,11 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list | None = None, includ
     df: pd.DataFrame
         The original DataFrame
     custom_index: list or None
-        The columns to group the deaths by. Must be a column in the data, but not "Start_Year" or "End_Year".
+        The columns to group the deaths by. All elements must be columns of df, but not "Start_Year" or "End_Year".
         Note that df is not normalized. Only independent columns should be passed in order to avoid anomalies. Example: [Country, Disaster_Type] -> ok. [Disaster_Type, Disaster_Subtype] -> NOT ok.
     include_zero: bool
         Include rows with 0 deaths.
-        Note that enabling this option in combination with a custom_index will lengthen the returned series considerably.
+        Note that enabling this option in combination with a custom_index will lengthen the returned series' index considerably.
 
     Returns
     -------
