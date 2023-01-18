@@ -158,16 +158,13 @@ def get_yearly_deaths(df: pd.DataFrame, custom_index: list | None = None, includ
     return deaths_per_year.astype(np.float64)
 
 
-def plot_world_map(merged, title):
-    """
-    Plotting world maps.
+def plot_world_map(merged, title) -> None:
+    """ Plot world maps.
+
     Parameters
     ----------
     merged: pd.DataFrame
         Dataframe merged with coordinates df
-    Plots
-    -------
-    World map
     """
     # Read data to json.
     merged_json = json.loads(merged.to_json())
