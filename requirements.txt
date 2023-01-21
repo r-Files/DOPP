@@ -3,5 +3,5 @@ numpy~=1.24.1
 openpyxl~=3.0.10
 pandas~=1.5.2
 seaborn~=0.12.2
-bokeh~=3.0.3
+bokeh~=2.4.3
 geopandas~=0.12.2
